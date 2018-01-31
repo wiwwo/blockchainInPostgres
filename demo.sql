@@ -1,36 +1,53 @@
+\echo
+\echo inserting some events...
+\echo note the date i try to insert, and what is really inserted..
 insert into blockchainInPostgres.events (blockHeight, eventDate, info1, info2, info3) values (99, current_timestamp - interval '10' day, 'VY1234','took off', '12 mins delay');
 insert into blockchainInPostgres.events (blockHeight, eventDate, info1, info2, info3) values (123456, current_timestamp - interval '22' day, 'VY1234','landed', '02 mins delay');
 insert into blockchainInPostgres.events (blockHeight, eventDate, info1, info2, info3) values (987654, current_timestamp - interval '1' day, 'VY4321','landed', '');
+
+\echo
+\echo trying to force events table...
+\echo in blockchain, events table is append only!
 delete from blockchainInPostgres.events;
 update blockchainInPostgres.events set info1='xxx';
 
+\echo
+\echo take a look at events table
 select * from blockchainInPostgres.events;
 
 \echo
-\echo
+\echo ----------
 \echo MINING...
-\echo
+\echo ----------
+begin;
 select blockchainInPostgres.generateBlock();
--- https://duckduckgo.com/?q=sha1+%224c054602d5420490806e042b4b9e2375c695c264-7%22
--- Need to do this outside
-alter table blockchainInPostgres.events enable trigger readOnlyEvent;
---
+commit;
+\echo
+\echo take a look at events table again
+select * from blockchainInPostgres.events;
+\echo
+\echo and at blockchain table
 select * from blockchainInPostgres.blockChain;
 
 
-
+\echo
+\echo some more inserts...
 insert into blockchainInPostgres.events (blockHeight, eventDate, info1, info2, info3) values (556, current_timestamp - interval '50' day, 'Product 8896513573165','Expires', '2018-09-23');
 insert into blockchainInPostgres.events (blockHeight, eventDate, info1, info2, info3) values (21355, current_timestamp - interval '9' day, 'Part 578285471821','Produced', 'Factory DE2742');
 
+\echo
+\echo trying -AGAIN- to force events table...
+\echo in blockchain, events table is append only!
+delete from blockchainInPostgres.events;
+update blockchainInPostgres.events set info1='xxx';
 
 
 select * from blockchainInPostgres.events;
 \echo
-\echo
+\echo ----------
 \echo MINING...
-\echo
+\echo ----------
 select blockchainInPostgres.generateBlock();
--- Need to do this outside
-alter table blockchainInPostgres.events enable trigger readOnlyEvent;
---
 select * from blockchainInPostgres.blockChain;
+
+
