@@ -21,7 +21,8 @@ create table blockchainInPostgres.events (
 ,eventHash    varchar (42)  not null
 );
 
---- COMMENT HERE
+--- Proc for trigger; forbids deletes and updates on EVENTS table
+-- TODO: change to raise an exception
 create or replace function blockchainInPostgres.doNothign()
 returns trigger
 language plpgsql as
@@ -31,7 +32,7 @@ begin
 end
 $$;
 
---- COMMENT HERE
+--- Proc for trigger; fills in fields not allowed to be populated (AKA manipulated)
 create or replace function blockchainInPostgres.eventsInsert()
 returns trigger
 language plpgsql as
@@ -44,14 +45,14 @@ begin
 end
 $$;
 
---- COMMENT HERE
+--- Forbids deletes and updates on EVENTS table
 drop trigger if exists readOnlyEvent on blockchainInPostgres.events;
 create trigger readOnlyEvent
 before delete or update on blockchainInPostgres.events
 for each row
 execute procedure blockchainInPostgres.doNothign();
 
---- COMMENT HERE
+--- Fills in fields not allowed to be populated (AKA manipulated) by user
 drop trigger if exists onEventInsert on blockchainInPostgres.events;
 create trigger onEventInsert
 before insert on blockchainInPostgres.events
@@ -75,6 +76,10 @@ create table blockchainInPostgres.blockChain (
 );
 
 
+--- Here is the fun!
+-- This proc takes pending events (EVENTS.blockHeight = -1),
+-- creates new block, associates those transactions to newly created block,
+-- and calculates (as in MINES) the block hash
 create or replace function blockchainInPostgres.generateBlock()
 returns boolean
 language plpgsql as
@@ -95,13 +100,19 @@ declare
 
 begin
 
+  -- Disables trigger on EVENTS table, to update pending events blockHeight
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
 
+  -- TODO Pending transactions are now about to be added to the block
+  --update blockchainInPostgres.events set blockHeight=-99 where blockHeight=-1;
+
+  -- For every pending event...
   open hashCursor;
   loop
     fetch hashCursor into thisHash;
     exit when not found;
 
+    -- ... calculate the cumulative hash
     raise debug 'thisHash % ', thisHash;
     cumulativeHash = encode(digest(cumulativeHash || '-' || thisHash, 'sha1'),'hex');
 
@@ -109,22 +120,36 @@ begin
   close hashCursor;
   raise debug 'cumulativeHash % ', cumulativeHash;
 
+  --- Mining now!!!
   --- Proof of Work
-  -- "miningDifficulty"-times 0
-  --regExpDifficulty = '^([0-9]){'||miningDifficulty||'}'; -- use this to make mining easier
+  -- A valid block is a block whose hash starts [as many ZEROES as miningDifficulty]
+  -- That is
+  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 0whateverhash   for miningDifficulty = 1
+  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 00whateverhash  for miningDifficulty = 2
+  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 000whateverhash for miningDifficulty = 3
+  -- etc
+  -- In reality, it should be hash(event1)+hash(event2) etc...
   regExpDifficulty = '^(0){'||miningDifficulty||'}';
+  --
+  -- you might want to use this
+  --regExpDifficulty = '^([0-9]){'||miningDifficulty||'}';
+  -- to make mining easier; instead of starting with 0, a valid nonce generates an hash with any digit ( regExp [0-9])
+  --
 
   -- Start mining!
   loop
 
+    -- try current nonce
     blockHash = encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex');
     firstBlockHashChar = substring(blockHash from 1 for 1);
 
+    -- as a safety measure, if i get to loopLimit loops, give up
     exit when thisNonce = loopLimit or (substring(firstBlockHashChar from 1 for miningDifficulty) ~ regExpDifficulty );
 
     thisNonce = thisNonce +1;
 
   end loop;
+  -- if i gave up, just write down a fake nonce in BLOCKCHAIN table
   if thisNonce = loopLimit
   then
     thisNonce = -99999;
@@ -133,15 +158,17 @@ begin
   insert into blockchainInPostgres.blockChain (blockHeight, blockDate, eventsHash, nonce, blockHash)
   values (nextval('blockchainInPostgres.blockHeightSeq'), current_timestamp, cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
 
+  -- pending events are assigned to the current block
   update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-1;
 
-  --alter table blockchainInPostgres.events enable trigger readOnlyEvent;
+  -- Enable the trigger back
+  alter table blockchainInPostgres.events enable trigger readOnlyEvent;
 
   return true;
 end
 $$;
 
-
+-- TODO
 create or replace function blockchainInPostgres.validateBlock()
 returns boolean
 language plpgsql as
