@@ -107,7 +107,7 @@ begin
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
 
   -- TODO Pending transactions are now about to be added to the block
-  --update blockchainInPostgres.events set blockHeight=-99 where blockHeight=-1;
+  update blockchainInPostgres.events set blockHeight=-99 where blockHeight=-1;
 
   -- For every pending event...
   open hashCursor;
@@ -162,7 +162,7 @@ begin
   values (nextval('blockchainInPostgres.blockHeightSeq'), extract(epoch from current_timestamp), cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
 
   -- pending events are assigned to the current block
-  update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-1;
+  update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-99;
 
   -- Enable the trigger back
   alter table blockchainInPostgres.events enable trigger readOnlyEvent;
