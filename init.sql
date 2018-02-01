@@ -14,7 +14,7 @@ create role blockchainInPostgres;
 drop table if exists blockchainInPostgres.events;
 create table blockchainInPostgres.events (
  blockHeight  integer       not null
-,eventEpoch   integer       not null
+,eventEpoch   numeric       not null
 ,info1        varchar(100)  not null
 ,info2        varchar(100)  not null
 ,info3        varchar(100)  not null
@@ -72,7 +72,7 @@ create sequence blockchainInPostgres.blockHeightSeq;
 
 create table blockchainInPostgres.blockChain (
  blockHeight  integer       not null
-,blockEpoch   integer       not null
+,blockEpoch   numeric       not null
 ,eventsHash   varchar(42)   not null
 ,nonce        integer       not null
 ,blockHash    varchar(42)   not null
