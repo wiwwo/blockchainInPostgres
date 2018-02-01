@@ -88,8 +88,9 @@ returns boolean
 language plpgsql as
 $$
 declare
+    blockSize           integer = 2;
     hashCursor          cursor for
-                          select eventHash from blockchainInPostgres.events where blockHeight=-1;
+                          select eventHash from blockchainInPostgres.events where blockHeight=-1 order by eventepoch limit blockSize;
     thisHash            varchar(50) = ' ';
     cumulativeHash      varchar(50) = ' ';
 
@@ -106,14 +107,14 @@ begin
   -- Disables trigger on EVENTS table, to update pending events blockHeight
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
 
-  -- TODO Pending transactions are now about to be added to the block
-  update blockchainInPostgres.events set blockHeight=-99 where blockHeight=-1;
-
   -- For every pending event...
   open hashCursor;
   loop
     fetch hashCursor into thisHash;
     exit when not found;
+
+    -- Transaction state put to Pending
+    update blockchainInPostgres.events set blockHeight=-99 where eventhash = thisHash;
 
     -- ... calculate the cumulative hash
     raise debug 'thisHash % ', thisHash;
