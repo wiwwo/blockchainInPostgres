@@ -14,7 +14,7 @@ create role blockchainInPostgres;
 drop table if exists blockchainInPostgres.events;
 create table blockchainInPostgres.events (
  blockHeight  integer       not null
-,eventDate    date          not null
+,eventEpoch   integer       not null
 ,info1        varchar(100)  not null
 ,info2        varchar(100)  not null
 ,info3        varchar(100)  not null
@@ -37,10 +37,13 @@ create or replace function blockchainInPostgres.eventsInsert()
 returns trigger
 language plpgsql as
 $$
+declare
+  currentEpoch    integer = extract(epoch from current_timestamp);
 begin
+
   NEW.blockHeight = -1;
-  NEW.eventDate= current_timestamp;
-  NEW.eventHash = encode(digest(NEW.info1||'-'||NEW.info2||'-'||NEW.info3, 'sha1'),'hex');
+  NEW.eventEpoch = currentEpoch;
+  NEW.eventHash = encode(digest(NEW.info1||'-'||NEW.info2||'-'||NEW.info3||'-'||currentEpoch, 'sha1'),'hex');
   return NEW;
 end
 $$;
@@ -69,7 +72,7 @@ create sequence blockchainInPostgres.blockHeightSeq;
 
 create table blockchainInPostgres.blockChain (
  blockHeight  integer       not null
-,blockDate    date          not null
+,blockEpoch   integer       not null
 ,eventsHash   varchar(42)   not null
 ,nonce        integer       not null
 ,blockHash    varchar(42)   not null
@@ -155,8 +158,8 @@ begin
     thisNonce = -99999;
   end if;
 
-  insert into blockchainInPostgres.blockChain (blockHeight, blockDate, eventsHash, nonce, blockHash)
-  values (nextval('blockchainInPostgres.blockHeightSeq'), current_timestamp, cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
+  insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
+  values (nextval('blockchainInPostgres.blockHeightSeq'), extract(epoch from current_timestamp), cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
 
   -- pending events are assigned to the current block
   update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-1;
@@ -178,7 +181,7 @@ declare
                         select info1, info2, info3, eventHash
                           from blockchainInPostgres.events
                          where blockHeight=p_blockHeight
-                      order by eventDate, blockHeight;
+                      order by eventEpoch, blockHeight;
     thisRow           record;
 
     maxBlock          numeric;
