@@ -13,7 +13,7 @@ update blockchainInPostgres.events set info1='xxx';
 
 \echo
 \echo take a look at events table
-select * from blockchainInPostgres.events;
+select * from blockchainInPostgres.events order by eventEpoch;
 
 \echo
 \echo ----------
@@ -24,10 +24,10 @@ select blockchainInPostgres.generateBlock();
 commit;
 \echo
 \echo take a look at events table again
-select * from blockchainInPostgres.events;
+select * from blockchainInPostgres.events order by eventEpoch;
 \echo
 \echo and at blockchain table
-select * from blockchainInPostgres.blockChain;
+select * from blockchainInPostgres.blockChain order by blockepoch;
 
 
 \echo
@@ -42,12 +42,21 @@ delete from blockchainInPostgres.events;
 update blockchainInPostgres.events set info1='xxx';
 
 
-select * from blockchainInPostgres.events;
+select * from blockchainInPostgres.events order by eventEpoch;
 \echo
 \echo ----------
 \echo MINING...
 \echo ----------
 select blockchainInPostgres.generateBlock();
-select * from blockchainInPostgres.blockChain;
+select * from blockchainInPostgres.blockChain order by blockepoch;
+
+\echo
+\echo ----------
+\echo MINING...
+\echo ----------
+select blockchainInPostgres.generateBlock();
+select * from blockchainInPostgres.blockChain order by blockepoch;
+
+
 
 
