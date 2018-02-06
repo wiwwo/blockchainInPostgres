@@ -1,3 +1,4 @@
+\timing off
 \echo
 \echo inserting some events...
 \echo note the date i try to insert, and what is really inserted..
@@ -16,11 +17,9 @@ update blockchainInPostgres.events set info1='xxx';
 select * from blockchainInPostgres.events order by eventEpoch;
 
 \echo
-\echo ----------
-\echo MINING...
-\echo ----------
+
 begin;
-select blockchainInPostgres.generateBlock();
+select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 commit;
 \echo
 \echo take a look at events table again
@@ -44,21 +43,36 @@ update blockchainInPostgres.events set info1='xxx';
 
 select * from blockchainInPostgres.events order by eventEpoch;
 \echo
-\echo ----------
-\echo MINING...
-\echo ----------
-select blockchainInPostgres.generateBlock();
+select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 select * from blockchainInPostgres.blockChain order by blockepoch;
 
 \echo
-\echo ----------
-\echo MINING...
-\echo ----------
-select blockchainInPostgres.generateBlock();
+
+select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 
 \echo ----------------------
-\echo ----------------------
-\echo ----------------------
-select * from blockchainInPostgres.events order by eventEpoch;
-select * from blockchainInPostgres.blockChain order by blockepoch;
-select blockchainInPostgres.validateBlock();
+--select * from blockchainInPostgres.events order by eventEpoch;
+--select * from blockchainInPostgres.blockChain order by blockepoch;
+
+select blockchainInPostgres.validateBlock() as "BlockValidationResult";
+
+
+\echo
+\echo
+\echo ---------------------------------
+\echo ---------------------------------
+\echo Now, force an update, and make validation fail
+alter table blockchainInPostgres.events disable trigger readOnlyEvent;
+select * from blockchainInPostgres.events where info1='VY1234' and info2='landed';
+update blockchainInPostgres.events set info3='on time' where info1='VY1234' and info2='landed';
+select * from blockchainInPostgres.events where info1='VY1234' and info2='landed';
+select blockchainInPostgres.validateBlock() as "BlockValidationResult";
+
+\echo
+\echo ---------------------------------
+\echo Now, reset field, check again, then break blockchain table
+update blockchainInPostgres.events set info3='02 mins delay' where info1='VY1234' and info2='landed';
+select blockchainInPostgres.validateBlock() as "BlockValidationResult";
+
+update blockchainInPostgres.blockChain set blockEpoch = 1234567890 where blockHeight = 2;
+select blockchainInPostgres.validateBlock() as "BlockValidationResult";
