@@ -74,5 +74,8 @@ select blockchainInPostgres.validateBlock() as "BlockValidationResult";
 update blockchainInPostgres.events set info3='02 mins delay' where info1='VY1234' and info2='landed';
 select blockchainInPostgres.validateBlock() as "BlockValidationResult";
 
-update blockchainInPostgres.blockChain set blockEpoch = 1234567890 where blockHeight = 2;
+select * from blockchainInPostgres.blockChain where blockHeight = 2;
+update blockchainInPostgres.blockChain set blockEpoch = 1111111111 where blockHeight = 2;
+select * from blockchainInPostgres.blockChain where blockHeight = 2;
 select blockchainInPostgres.validateBlock() as "BlockValidationResult";
+
