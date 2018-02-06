@@ -79,6 +79,89 @@ create table blockchainInPostgres.blockChain (
 );
 
 
+
+
+
+
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+
+-- This proc takes current blockChain status, and checks if
+-- someone changed something in the way... :-)
+create or replace function blockchainInPostgres.validateBlock()
+returns boolean
+language plpgsql as
+$$
+declare
+    eventsCursor      cursor (p_blockHeight integer) for
+                        select evts.blockHeight, evts.info1, evts.info2, evts.info3, evts.eventHash, evts.eventEpoch, blck.blockHash, blck.nonce
+                          from blockchainInPostgres.events evts
+                               ,blockchainInPostgres.blockChain blck
+                         where evts.blockHeight = blck.blockHeight
+                           and evts.blockHeight = p_blockHeight
+                      order by evts.eventEpoch, evts.blockHeight;
+    thisRow           record;
+
+    maxBlock          numeric;
+
+    thisHash          varchar(50) = '';
+    cumulativeHash    varchar(50) = ' ';
+
+    thisNonce         integer = 0;
+    thisBlockHash     varchar(50);
+begin
+
+  select max(blockHeight)
+    into maxBlock
+    from blockchainInPostgres.blockChain;
+
+  if maxBlock < 0
+  then
+    return true;
+  end if;
+
+  raise debug '--------------- maxBlock %', maxBlock;
+  for thisBlock in 1..maxBlock loop
+    cumulativeHash = ' ';
+    open eventsCursor (thisBlock);
+    loop
+      fetch eventsCursor into thisRow;
+      exit when not found;
+      thisBlockHash = thisRow.blockHash;
+      thisNonce = thisRow.nonce;
+      raise debug '------------ thisBlock %', thisBlock;
+
+      /* Events validation */
+      thisHash = encode(digest(thisRow.info1||'-'||thisRow.info2||'-'||thisRow.info3||'-'||thisRow.eventEpoch, 'sha1'),'hex');
+
+      if thisHash != thisRow.eventHash
+      then
+        raise exception 'evt different';
+      else
+        raise debug 'evt same';
+      end if;
+
+      cumulativeHash = encode(digest(cumulativeHash || '-' || thisHash, 'sha1'),'hex');
+
+      raise debug '--------- loop ------------------';
+    end loop;
+    close eventsCursor;
+
+    if encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex') != thisBlockHash
+      then
+        raise exception 'blck different';
+      else
+        raise debug 'blck same';
+      end if;
+  end loop;  -- for i in 1..maxblock loop
+
+  return true;
+end
+$$;
+
+
+
 --- Here is the fun!
 -- This proc takes pending events (EVENTS.blockHeight = -1),
 -- creates new block, associates those transactions to newly created block,
@@ -104,6 +187,11 @@ declare
 
 begin
 
+  --if not blockchainInPostgres.validateBlock()
+  --then
+  --  raise exception 'Blockchain has been invalidated!!!';
+  --end if;
+
   -- Disables trigger on EVENTS table, to update pending events blockHeight
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
 
@@ -122,7 +210,7 @@ begin
 
   end loop;
   close hashCursor;
-  raise debug 'cumulativeHash % ', cumulativeHash;
+  raise info 'cumulativeHash % ', cumulativeHash;
 
   --- Mining now!!!
   --- Proof of Work
@@ -172,45 +260,3 @@ begin
 end
 $$;
 
--- TODO
-create or replace function blockchainInPostgres.validateBlock()
-returns boolean
-language plpgsql as
-$$
-declare
-    eventsCursor      cursor (p_blockHeight integer) for
-                        select info1, info2, info3, eventHash
-                          from blockchainInPostgres.events
-                         where blockHeight=p_blockHeight
-                      order by eventEpoch, blockHeight;
-    thisRow           record;
-
-    maxBlock          numeric;
-
-    thisHash          varchar(50);
-    cumulativeHash    varchar(50) = ' ';
-
-    thisNonce         integer = 0;
-begin
-
-  select max(blockHeight)
-  into maxBlock
-  from blockchainInPostgres.blockChain;
-
-  for thisBlock in 1..maxblock loop
-    open eventsCursor (thisBlock);
-    loop
-      fetch eventsCursor into thisRow;
-      exit when not found;
-
-      raise debug 'thisHash % ', thisRow;
-
-    end loop;
-
-    close eventsCursor;
-  end loop; -- for i in 1..maxblock loop
-  return true;
-end
-$$;
-
---https://stackoverflow.com/questions/25425944/does-postgres-support-nested-or-autonomous-transactions

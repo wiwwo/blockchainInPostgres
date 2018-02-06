@@ -55,8 +55,10 @@ select * from blockchainInPostgres.blockChain order by blockepoch;
 \echo MINING...
 \echo ----------
 select blockchainInPostgres.generateBlock();
+
+\echo ----------------------
+\echo ----------------------
+\echo ----------------------
+select * from blockchainInPostgres.events order by eventEpoch;
 select * from blockchainInPostgres.blockChain order by blockepoch;
-
-
-
-
+select blockchainInPostgres.validateBlock();
