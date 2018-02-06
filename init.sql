@@ -95,7 +95,7 @@ language plpgsql as
 $$
 declare
     eventsCursor      cursor (p_blockHeight integer) for
-                        select evts.blockHeight, evts.info1, evts.info2, evts.info3, evts.eventHash, evts.eventEpoch, blck.blockHash, blck.nonce
+                        select evts.blockHeight, evts.info1, evts.info2, evts.info3, evts.eventHash, evts.eventEpoch, blck.blockHash, blck.nonce, blck.blockEpoch
                           from blockchainInPostgres.events evts
                                ,blockchainInPostgres.blockChain blck
                          where evts.blockHeight = blck.blockHeight
@@ -110,13 +110,14 @@ declare
 
     thisNonce         integer = 0;
     thisBlockHash     varchar(50);
+    thisEpoch         integer;
 begin
 
   select max(blockHeight)
     into maxBlock
     from blockchainInPostgres.blockChain;
 
-  if maxBlock < 0
+  if maxBlock is null
   then
     return true;
   end if;
@@ -130,6 +131,7 @@ begin
       exit when not found;
       thisBlockHash = thisRow.blockHash;
       thisNonce = thisRow.nonce;
+      thisEpoch = thisRow.blockEpoch;
       raise debug '------------ thisBlock %', thisBlock;
 
       /* Events validation */
@@ -137,7 +139,7 @@ begin
 
       if thisHash != thisRow.eventHash
       then
-        raise exception 'evt different';
+        raise exception '**** Event table has been altered!!!';
       else
         raise debug 'evt same';
       end if;
@@ -148,9 +150,12 @@ begin
     end loop;
     close eventsCursor;
 
+    -- Add timestamp to block hash
+    cumulativeHash = encode(digest(cumulativeHash || '-' || thisEpoch, 'sha1'),'hex');
+
     if encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex') != thisBlockHash
       then
-        raise exception 'blck different';
+        raise exception '**** Blockchain table has been altered!!! ';
       else
         raise debug 'blck same';
       end if;
@@ -176,6 +181,7 @@ declare
                           select eventHash from blockchainInPostgres.events where blockHeight=-1 order by eventepoch limit blockSize;
     thisHash            varchar(50) = ' ';
     cumulativeHash      varchar(50) = ' ';
+    currentEpoch        integer = extract(epoch from current_timestamp);
 
     loopLimit           integer = 999999;
     miningDifficulty    integer = 1;
@@ -187,10 +193,10 @@ declare
 
 begin
 
-  --if not blockchainInPostgres.validateBlock()
-  --then
-  --  raise exception 'Blockchain has been invalidated!!!';
-  --end if;
+  if not blockchainInPostgres.validateBlock()
+  then
+    raise exception 'Blockchain has been invalidated!!!';
+  end if;
 
   -- Disables trigger on EVENTS table, to update pending events blockHeight
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
@@ -210,7 +216,11 @@ begin
 
   end loop;
   close hashCursor;
-  raise info 'cumulativeHash % ', cumulativeHash;
+  raise debug 'cumulativeHash % ', cumulativeHash;
+
+  -- Add timestamp to block hash
+  cumulativeHash = encode(digest(cumulativeHash || '-' || currentEpoch, 'sha1'),'hex');
+
 
   --- Mining now!!!
   --- Proof of Work
@@ -248,7 +258,7 @@ begin
   end if;
 
   insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
-  values (nextval('blockchainInPostgres.blockHeightSeq'), extract(epoch from current_timestamp), cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
+  values (nextval('blockchainInPostgres.blockHeightSeq'), currentEpoch, cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
 
   -- pending events are assigned to the current block
   update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-99;
