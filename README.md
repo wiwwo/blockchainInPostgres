@@ -6,7 +6,8 @@ The demo is about Mining, the block Size "problem" lead to Bitcoin fork and abou
 <li>Block size is declared in that very same function, `blockSize` variable.
 <li>Blockchain and `events` table checking function is `blockchainInPostgres.validateBlock()`, same `init.sql` file.
 I do not have time -yet- to comment code, _sorry sorry sorry sorry sorry sorry sorry sorry_.
-
+<br>
+Of course, distribution is not included here :-P
 
 <br>
 
@@ -213,5 +214,16 @@ LOCATION:  exec_stmt_raise, pl_exec.c:3216
 
 =#
 ```
+
+# Future...
+Well, i need to make ACTUAL stuff more readable and better, buuuuut...<br>
+An idea would be to simulate a Ethreum Blockchain, by doing something like
+```
+| info1  | info2  |  info3  |
++--------+--------+---------+
+| 1 + 1  | =      | 2       |
+```
+And the validation function would execute "code" in info1, and check (info2) with result (info3) in chain.
+
 
 # Have fun!
