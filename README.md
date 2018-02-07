@@ -1,6 +1,6 @@
 ```diff
-+WORK IN PROGRESS
--Will code for time to code
+-WORK IN PROGRESS
++Will code for time to code
 ```
 
 # Blockchain in Postgresql
