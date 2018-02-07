@@ -73,6 +73,14 @@ select blockchainInPostgres.validateBlock() as "BlockValidationResult";
 \echo Now, reset field, check again, then break blockchain table
 update blockchainInPostgres.events set info3='02 mins delay' where info1='VY1234' and info2='landed';
 select blockchainInPostgres.validateBlock() as "BlockValidationResult";
+\echo
+\echo
+\echo
+select * from blockchainInPostgres.events order by eventEpoch;
+\echo
+select * from blockchainInPostgres.blockChain order by blockepoch;
+\echo
+\echo
 
 select * from blockchainInPostgres.blockChain where blockHeight = 2;
 update blockchainInPostgres.blockChain set blockEpoch = 1111111111 where blockHeight = 2;
