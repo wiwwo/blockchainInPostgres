@@ -185,7 +185,7 @@ declare
 
     loopLimit           integer = 999999;
     miningDifficulty    integer = 1;
-    thisNonce           integer = 0;
+    thisNonce           integer = (random()*1000000)::integer;
     blockHash           varchar(50) = ' ';
 
     regExpDifficulty    varchar(50);
