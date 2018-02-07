@@ -2,7 +2,7 @@
 
 The demo is about Mining, the block Size "problem" lead to Bitcoin fork and about integrity check.
 
-<li>Mining function is `blockchainInPostgres.generateBlock()` function, in `init.sql`.
+<li>Mining function is ` blockchainInPostgres.generateBlock() ` function, in `init.sql`.
 <li>Block size is declared in that very same function, `blockSize` variable.
 <li>Blockchain and `events` table checking function is `blockchainInPostgres.validateBlock()`, same `init.sql` file.
 I do not have time -yet- to comment code, _sorry sorry sorry sorry sorry sorry sorry sorry_.
