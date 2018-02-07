@@ -1,3 +1,8 @@
+```diff
++WORK IN PROGRESS
+-Will code for time to code
+```
+
 # Blockchain in Postgresql
 
 The demo is about Mining, the block Size "problem" lead to Bitcoin fork and about integrity check.
