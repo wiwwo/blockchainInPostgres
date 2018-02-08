@@ -85,6 +85,7 @@ Time: 1.000 ms
 ```
 <br>
 ### `demo.sql`
+<br>
 ```
 =# \i demo.sql
 Timing is off.
