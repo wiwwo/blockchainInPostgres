@@ -1,11 +1,3 @@
------
------
---- BIG TODO: block T1 hash depends on block T0.
----  That is what it's all about :-P
------
------
-
-
 -- install package postgresql-contrib-{pg_version}
 
 create extension pgcrypto;
@@ -76,7 +68,7 @@ execute procedure blockchainInPostgres.eventsInsert();
 --- BLOCKCHAIN table
 --- --- --- --- --- --- ---
 drop sequence if exists blockchainInPostgres.blockHeightSeq;
-create sequence blockchainInPostgres.blockHeightSeq;
+create sequence blockchainInPostgres.blockHeightSeq start 1;
 
 create table blockchainInPostgres.blockChain (
  blockHeight  integer       not null
@@ -119,6 +111,7 @@ declare
     thisNonce         integer = 0;
     thisBlockHash     varchar(50);
     thisEpoch         integer;
+    prevBlockHash     varchar(50);
 begin
 
   select max(blockHeight)
@@ -133,6 +126,13 @@ begin
   raise debug '--------------- maxBlock %', maxBlock;
   for thisBlock in 1..maxBlock loop
     cumulativeHash = ' ';
+
+    select blockHash
+      into prevBlockHash
+      from blockchainInPostgres.blockChain
+     where blockHeight = thisBlock-1
+    ;
+
     open eventsCursor (thisBlock);
     loop
       fetch eventsCursor into thisRow;
@@ -161,12 +161,16 @@ begin
     -- Add timestamp to block hash
     cumulativeHash = encode(digest(cumulativeHash || '-' || thisEpoch, 'sha1'),'hex');
 
+    -- This is why it is called "blockCHAIN":
+    -- Add previous block hash to calculate current block hash
+    cumulativeHash = encode(digest(cumulativeHash || '-' || prevBlockHash, 'sha1'),'hex');
+
     if encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex') != thisBlockHash
-      then
-        raise exception '**** Blockchain table has been altered!!! ';
-      else
-        raise debug 'blck same';
-      end if;
+    then
+      raise exception '**** Blockchain table has been altered!!! ';
+    else
+      raise debug 'blck same';
+    end if;
   end loop;  -- for i in 1..maxblock loop
 
   return true;
@@ -189,6 +193,7 @@ declare
                           select eventHash from blockchainInPostgres.events where blockHeight=-1 order by eventepoch limit blockSize;
     thisHash            varchar(50) = ' ';
     cumulativeHash      varchar(50) = ' ';
+    eventsHash          varchar(50) = ' ';
     currentEpoch        integer = extract(epoch from current_timestamp);
 
     loopLimit           integer = 999999;
@@ -199,12 +204,20 @@ declare
     regExpDifficulty    varchar(50);
     firstBlockHashChar  char(1);
 
+    prevBlockHash     varchar(50);
+
 begin
 
   if not blockchainInPostgres.validateBlock()
   then
     raise exception 'Blockchain has been invalidated!!!';
   end if;
+
+  select blck.blockHash
+    into prevBlockHash
+    from blockchainInPostgres.blockChain blck
+   order by blck.blockHeight desc limit 1
+  ;
 
   -- Disables trigger on EVENTS table, to update pending events blockHeight
   alter table blockchainInPostgres.events disable trigger readOnlyEvent;
@@ -229,14 +242,19 @@ begin
   -- Add timestamp to block hash
   cumulativeHash = encode(digest(cumulativeHash || '-' || currentEpoch, 'sha1'),'hex');
 
+  -- Add previous block hash to calculate current block hash
+  cumulativeHash = encode(digest(cumulativeHash || '-' || prevBlockHash, 'sha1'),'hex');
+
+  eventsHash = cumulativeHash;
+
 
   --- Mining now!!!
   --- Proof of Work
   -- A valid block is a block whose hash starts [as many ZEROES as miningDifficulty]
   -- That is
-  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 0whateverhash   for miningDifficulty = 1
-  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 00whateverhash  for miningDifficulty = 2
-  --  hash(hash(event1+hash(event2+hash(event3))))+nonce) = 000whateverhash for miningDifficulty = 3
+  --  hash(hash(hash(event1+hash(event2+hash(event3+hash(prevBlockHash)))))+nonce) = 0whateverhash   for miningDifficulty = 1
+  --  hash(hash(hash(event1+hash(event2+hash(event3+hash(prevBlockHash)))))+nonce) = 00whateverhash  for miningDifficulty = 2
+  --  hash(hash(hash(event1+hash(event2+hash(event3+hash(prevBlockHash)))))+nonce) = 000whateverhash for miningDifficulty = 3
   -- etc
   -- In reality, it should be hash(event1)+hash(event2) etc...
   regExpDifficulty = '^(0){'||miningDifficulty||'}';
@@ -265,8 +283,10 @@ begin
     thisNonce = -99999;
   end if;
 
+  cumulativeHash = encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex');
+
   insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
-  values (nextval('blockchainInPostgres.blockHeightSeq'), currentEpoch, cumulativeHash, thisNonce, encode(digest(cumulativeHash||'-'||thisNonce, 'sha1'),'hex'));
+  values (nextval('blockchainInPostgres.blockHeightSeq'), currentEpoch, eventsHash, thisNonce, cumulativeHash);
 
   -- pending events are assigned to the current block
   update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-99;
@@ -278,3 +298,5 @@ begin
 end
 $$;
 
+insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
+values (0, 0, 0, 0, 'genesis');
