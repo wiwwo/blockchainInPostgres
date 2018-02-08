@@ -1,3 +1,11 @@
+-----
+-----
+--- BIG TODO: block T1 hash depends on block T0.
+---  That is what it's all about :-P
+-----
+-----
+
+
 -- install package postgresql-contrib-{pg_version}
 
 create extension pgcrypto;
