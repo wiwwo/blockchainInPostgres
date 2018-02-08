@@ -25,7 +25,7 @@ Prerequisites: any 9.* postgreSql; package `postgresql-contrib` installed (for h
 ## Execution screenshot
 (Subject to heavy changes, just an idea... :-P)
 <br>
-`init.sql`
+### `init.sql`
 ```
 =# \i init.sql
 psql:init.sql:3: ERROR:  42710: extension "pgcrypto" already exists
@@ -83,8 +83,8 @@ Time: 1.501 ms
 CREATE FUNCTION
 Time: 1.000 ms
 ```
-<br><br>
-`demo.sql`
+<br>
+### `demo.sql`
 ```
 =# \i demo.sql
 Timing is off.
@@ -97,16 +97,13 @@ INSERT 0 1
 
 trying to force events table...
 in blockchain, events table is append only!
-DELETE 0
+DELETE 8
 UPDATE 0
 
 take a look at events table
- blockheight | eventepoch | info1  |  info2   |     info3     |                eventhash
--------------+------------+--------+----------+---------------+------------------------------------------
-          -1 | 1517918615 | VY1234 | took off | 12 mins delay | 2683fd9166eec162415d8ab81542aafa9d1fa221
-          -1 | 1517918615 | VY1234 | landed   | 02 mins delay | a2717a4a08bd12e4062efa695cef2592231123b9
-          -1 | 1517918615 | VY4321 | landed   |               | a35958a5a79febe8915d03e56970c45daef7e27f
-(3 rows)
+ blockheight | eventepoch | info1 | info2 | info3 | eventhash
+-------------+------------+-------+-------+-------+-----------
+(0 rows)
 
 
 BEGIN
@@ -118,19 +115,20 @@ BEGIN
 COMMIT
 
 take a look at events table again
- blockheight | eventepoch | info1  |  info2   |     info3     |                eventhash
--------------+------------+--------+----------+---------------+------------------------------------------
-          -1 | 1517918615 | VY4321 | landed   |               | a35958a5a79febe8915d03e56970c45daef7e27f
-           1 | 1517918615 | VY1234 | took off | 12 mins delay | 2683fd9166eec162415d8ab81542aafa9d1fa221
-           1 | 1517918615 | VY1234 | landed   | 02 mins delay | a2717a4a08bd12e4062efa695cef2592231123b9
-(3 rows)
+ blockheight | eventepoch | info1 | info2 | info3 | eventhash
+-------------+------------+-------+-------+-------+-----------
+(0 rows)
 
 
 and at blockchain table
- blockheight | blockepoch |                eventshash                | nonce |                blockhash
--------------+------------+------------------------------------------+-------+------------------------------------------
-           1 | 1517918615 | bcea8f9506d2a34c6820bcd1f2df3f0b800f421f |     0 | 06a336d0b72048c24fb08435156b6f96ae2e3317
-(1 row)
+ blockheight | blockepoch |                eventshash                | nonce  |                blockhash
+-------------+------------+------------------------------------------+--------+------------------------------------------
+           0 |          0 | 0                                        |      0 | genesis
+           2 | 1111111111 | 27e194eacb862a9286d8c4eeda518ce61fc13940 | 792047 | 032e1f12210076b03d7e81c7574dc6e2baa7e9a4
+           1 | 1518101869 | c077a2296ca130f5a6f7952f9650cc64877375a6 | 382675 | 0d28402737a1dbf2282a4df3805525e6a19d2353
+           3 | 1518101872 | 8dfd232b7907c0e26654945deaa4ec35c6c7b23e | 526744 | 0be55af222e2c4f6cd0df686edf849b8d3607192
+           4 | 1518101880 | 1ce0c769a623d6592a96849d361bdca242ab6aa5 | 162412 | 00877aa059ebdc36e76a508b2699a6bdb1a3b298
+(5 rows)
 
 
 some more inserts...
@@ -143,23 +141,8 @@ DELETE 0
 UPDATE 0
  blockheight | eventepoch |         info1         |  info2   |     info3      |                eventhash
 -------------+------------+-----------------------+----------+----------------+------------------------------------------
-          -1 | 1517918615 | VY4321                | landed   |                | a35958a5a79febe8915d03e56970c45daef7e27f
-           1 | 1517918615 | VY1234                | took off | 12 mins delay  | 2683fd9166eec162415d8ab81542aafa9d1fa221
-           1 | 1517918615 | VY1234                | landed   | 02 mins delay  | a2717a4a08bd12e4062efa695cef2592231123b9
-          -1 | 1517918615 | Product 8896513573165 | Expires  | 2018-09-23     | a24c8cadf95c54e2de6713ff6318bbdaa9d61d6f
-          -1 | 1517918615 | Part 578285471821     | Produced | Factory DE2742 | e6a5fc91d53157d28ebc421c0594bcdfa42ac9f2
-(5 rows)
-
-
- NowGeneratingBlock
---------------------
- t
-(1 row)
-
- blockheight | blockepoch |                eventshash                | nonce |                blockhash
--------------+------------+------------------------------------------+-------+------------------------------------------
-           1 | 1517918615 | bcea8f9506d2a34c6820bcd1f2df3f0b800f421f |     0 | 06a336d0b72048c24fb08435156b6f96ae2e3317
-           2 | 1517918615 | 468facbcfa517efa105e70ce95d5e859316f7144 |     9 | 0101545bba4fadb4e3b5e9abdb250498cba5c4bc
+          -1 | 1518101880 | Product 8896513573165 | Expires  | 2018-09-23     | 50532418b09bf45f3f34f8ac0a8a1c74f74a93d4
+          -1 | 1518101880 | Part 578285471821     | Produced | Factory DE2742 | a04a1e6f1c67172db13e5acf48de2abd0d30ed9f
 (2 rows)
 
 
@@ -168,52 +151,83 @@ UPDATE 0
  t
 (1 row)
 
-----------------------
- BlockValidationResult
------------------------
+ blockheight | blockepoch |                eventshash                | nonce  |                blockhash
+-------------+------------+------------------------------------------+--------+------------------------------------------
+           0 |          0 | 0                                        |      0 | genesis
+           2 | 1111111111 | 27e194eacb862a9286d8c4eeda518ce61fc13940 | 792047 | 032e1f12210076b03d7e81c7574dc6e2baa7e9a4
+           1 | 1518101869 | c077a2296ca130f5a6f7952f9650cc64877375a6 | 382675 | 0d28402737a1dbf2282a4df3805525e6a19d2353
+           3 | 1518101872 | 8dfd232b7907c0e26654945deaa4ec35c6c7b23e | 526744 | 0be55af222e2c4f6cd0df686edf849b8d3607192
+           4 | 1518101880 | 1ce0c769a623d6592a96849d361bdca242ab6aa5 | 162412 | 00877aa059ebdc36e76a508b2699a6bdb1a3b298
+           5 | 1518101880 | 556eec1a49e3e1b93ce7ae2c51336c4014d520fb | 489517 | 0d8ee12ecf9044f7f77e6e02e099b95e61728bf5
+(6 rows)
+
+
+ NowGeneratingBlock
+--------------------
  t
 (1 row)
 
+----------------------
+psql:demo.sql:57: ERROR:  P0001: **** Blockchain table has been altered!!!
+LOCATION:  exec_stmt_raise, pl_exec.c:3216
 
 
 ---------------------------------
 ---------------------------------
 Now, force an update, and make validation fail
 ALTER TABLE
- blockheight | eventepoch | info1  | info2  |     info3     |                eventhash
--------------+------------+--------+--------+---------------+------------------------------------------
-           1 | 1517918615 | VY1234 | landed | 02 mins delay | a2717a4a08bd12e4062efa695cef2592231123b9
-(1 row)
+ blockheight | eventepoch | info1 | info2 | info3 | eventhash
+-------------+------------+-------+-------+-------+-----------
+(0 rows)
 
-UPDATE 1
- blockheight | eventepoch | info1  | info2  |  info3  |                eventhash
--------------+------------+--------+--------+---------+------------------------------------------
-           1 | 1517918615 | VY1234 | landed | on time | a2717a4a08bd12e4062efa695cef2592231123b9
-(1 row)
+UPDATE 0
+ blockheight | eventepoch | info1 | info2 | info3 | eventhash
+-------------+------------+-------+-------+-------+-----------
+(0 rows)
 
-psql:demo.sql:69: ERROR:  P0001: **** Event table has been altered!!!
+psql:demo.sql:69: ERROR:  P0001: **** Blockchain table has been altered!!!
 LOCATION:  exec_stmt_raise, pl_exec.c:3216
 
 ---------------------------------
 Now, reset field, check again, then break blockchain table
+UPDATE 0
+psql:demo.sql:75: ERROR:  P0001: **** Blockchain table has been altered!!!
+LOCATION:  exec_stmt_raise, pl_exec.c:3216
+
+
+
+ blockheight | eventepoch |         info1         |  info2   |     info3      |                eventhash
+-------------+------------+-----------------------+----------+----------------+------------------------------------------
+           5 | 1518101880 | Product 8896513573165 | Expires  | 2018-09-23     | 50532418b09bf45f3f34f8ac0a8a1c74f74a93d4
+           5 | 1518101880 | Part 578285471821     | Produced | Factory DE2742 | a04a1e6f1c67172db13e5acf48de2abd0d30ed9f
+(2 rows)
+
+
+ blockheight | blockepoch |                eventshash                | nonce  |                blockhash
+-------------+------------+------------------------------------------+--------+------------------------------------------
+           0 |          0 | 0                                        |      0 | genesis
+           2 | 1111111111 | 27e194eacb862a9286d8c4eeda518ce61fc13940 | 792047 | 032e1f12210076b03d7e81c7574dc6e2baa7e9a4
+           1 | 1518101869 | c077a2296ca130f5a6f7952f9650cc64877375a6 | 382675 | 0d28402737a1dbf2282a4df3805525e6a19d2353
+           3 | 1518101872 | 8dfd232b7907c0e26654945deaa4ec35c6c7b23e | 526744 | 0be55af222e2c4f6cd0df686edf849b8d3607192
+           4 | 1518101880 | 1ce0c769a623d6592a96849d361bdca242ab6aa5 | 162412 | 00877aa059ebdc36e76a508b2699a6bdb1a3b298
+           5 | 1518101880 | 556eec1a49e3e1b93ce7ae2c51336c4014d520fb | 489517 | 0d8ee12ecf9044f7f77e6e02e099b95e61728bf5
+           6 | 1518101880 | b038681a7f749836ae448ad5a76a709dbc9542aa | 520021 | 03d2b8fb46868f97a23086059cb6b8b92f9fe117
+(7 rows)
+
+
+
+ blockheight | blockepoch |                eventshash                | nonce  |                blockhash
+-------------+------------+------------------------------------------+--------+------------------------------------------
+           2 | 1111111111 | 27e194eacb862a9286d8c4eeda518ce61fc13940 | 792047 | 032e1f12210076b03d7e81c7574dc6e2baa7e9a4
+(1 row)
+
 UPDATE 1
- BlockValidationResult
------------------------
- t
+ blockheight | blockepoch |                eventshash                | nonce  |                blockhash
+-------------+------------+------------------------------------------+--------+------------------------------------------
+           2 | 1111111111 | 27e194eacb862a9286d8c4eeda518ce61fc13940 | 792047 | 032e1f12210076b03d7e81c7574dc6e2baa7e9a4
 (1 row)
 
- blockheight | blockepoch |                eventshash                | nonce |                blockhash
--------------+------------+------------------------------------------+-------+------------------------------------------
-           2 | 1517918615 | 468facbcfa517efa105e70ce95d5e859316f7144 |     9 | 0101545bba4fadb4e3b5e9abdb250498cba5c4bc
-(1 row)
-
-UPDATE 1
- blockheight | blockepoch |                eventshash                | nonce |                blockhash
--------------+------------+------------------------------------------+-------+------------------------------------------
-           2 | 1111111111 | 468facbcfa517efa105e70ce95d5e859316f7144 |     9 | 0101545bba4fadb4e3b5e9abdb250498cba5c4bc
-(1 row)
-
-psql:demo.sql:80: ERROR:  P0001: **** Blockchain table has been altered!!!
+psql:demo.sql:88: ERROR:  P0001: **** Blockchain table has been altered!!!
 LOCATION:  exec_stmt_raise, pl_exec.c:3216
 
 =#
