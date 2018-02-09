@@ -78,7 +78,13 @@ create table blockchainInPostgres.blockChain (
 ,blockHash    varchar(42)   not null
 );
 
-
+-- of course, Blockchain table is read only as well...
+--- Forbids deletes and updates on EVENTS table
+drop trigger if exists readOnlyBlockChain on blockchainInPostgres.blockChain;
+create trigger readOnlyBlockChain
+before delete or update on blockchainInPostgres.blockChain
+for each row
+execute procedure blockchainInPostgres.doNothign();
 
 
 

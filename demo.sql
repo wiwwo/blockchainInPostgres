@@ -82,6 +82,8 @@ select * from blockchainInPostgres.blockChain order by blockepoch;
 \echo
 \echo
 
+alter table blockchainInPostgres.blockChain disable trigger readOnlyBlockChain;
+
 select * from blockchainInPostgres.blockChain where blockHeight = 2;
 update blockchainInPostgres.blockChain set blockEpoch = 1111111111 where blockHeight = 2;
 select * from blockchainInPostgres.blockChain where blockHeight = 2;
