@@ -103,8 +103,9 @@ alter table blockchainInPostgres.events     enable trigger onEventInsert;
 
 drop sequence if exists blockchainInPostgres.blockHeightSeq;
 create sequence blockchainInPostgres.blockHeightSeq start 1;
-insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
-values (0, 0, 0, 0, 'genesis');
+insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, previousBlockHash, blockHash)
+values (0, 0, 0, 0, 0, 'genesis');
+
 
 
 \echo

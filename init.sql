@@ -71,11 +71,12 @@ drop sequence if exists blockchainInPostgres.blockHeightSeq;
 create sequence blockchainInPostgres.blockHeightSeq start 1;
 
 create table blockchainInPostgres.blockChain (
- blockHeight  integer       not null
-,blockEpoch   numeric       not null
-,eventsHash   varchar(42)   not null
-,nonce        integer       not null
-,blockHash    varchar(42)   not null
+ blockHeight          integer       not null
+,blockEpoch           numeric       not null
+,eventsHash           varchar(42)   not null
+,nonce                integer       not null
+,previousBlockHash    varchar(42)   not null
+,blockHash            varchar(42)   not null
 );
 
 -- of course, Blockchain table is read only as well...
@@ -291,8 +292,8 @@ begin
 
   cumulativeHash = encode(digest(cumulativeHash || '-' || thisNonce, 'sha1'),'hex');
 
-  insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
-  values (nextval('blockchainInPostgres.blockHeightSeq'), currentEpoch, eventsHash, thisNonce, cumulativeHash);
+  insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, previousBlockHash, blockHash)
+  values (nextval('blockchainInPostgres.blockHeightSeq'), currentEpoch, eventsHash, thisNonce, prevBlockHash, cumulativeHash);
 
   -- pending events are assigned to the current block
   update blockchainInPostgres.events set blockHeight=lastval() where blockHeight=-99;
@@ -304,5 +305,5 @@ begin
 end
 $$;
 
-insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, blockHash)
-values (0, 0, 0, 0, 'genesis');
+insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, previousBlockHash, blockHash)
+values (0, 0, 0, 0, 0, 'genesis');
