@@ -93,6 +93,7 @@ Time: 1.000 ms
 =# \i demo.sql
 Timing is off.
 
+
 inserting some events...
 note the date i try to insert, and what is really inserted..
 INSERT 0 1
@@ -107,9 +108,9 @@ UPDATE 0
 take a look at events table
  blockheight | eventepoch | info1  |  info2   |     info3     |                eventhash
 -------------+------------+--------+----------+---------------+------------------------------------------
-          -1 | 1518508125 | VY1234 | took off | 12 mins delay | 2d8b9b759bf9b0dc6fb861ed68414945c8ce3908
-          -1 | 1518508125 | VY1234 | landed   | 02 mins delay | 2b34052e3531e7ea544adc8325e25697d660d2c2
-          -1 | 1518508125 | VY4321 | landed   |               | 9e835dc91c376ae1d97ae08913d6ead932668664
+          -1 | 1518521155 | VY1234 | took off | 12 mins delay | 5c2e37b8ec1843f059133b50e73e94321c372129
+          -1 | 1518521155 | VY1234 | landed   | 02 mins delay | 264d07ad9908789a13ff057082e60af80aa0d00d
+          -1 | 1518521155 | VY4321 | landed   |               | cb112adf2d9349d5fbb5658a6373753974a3340e
 (3 rows)
 
 
@@ -124,9 +125,9 @@ COMMIT
 take a look at events table again
  blockheight | eventepoch | info1  |  info2   |     info3     |                eventhash
 -------------+------------+--------+----------+---------------+------------------------------------------
-          -1 | 1518508125 | VY4321 | landed   |               | 9e835dc91c376ae1d97ae08913d6ead932668664
-           1 | 1518508125 | VY1234 | took off | 12 mins delay | 2d8b9b759bf9b0dc6fb861ed68414945c8ce3908
-           1 | 1518508125 | VY1234 | landed   | 02 mins delay | 2b34052e3531e7ea544adc8325e25697d660d2c2
+          -1 | 1518521155 | VY4321 | landed   |               | cb112adf2d9349d5fbb5658a6373753974a3340e
+           1 | 1518521155 | VY1234 | took off | 12 mins delay | 5c2e37b8ec1843f059133b50e73e94321c372129
+           1 | 1518521155 | VY1234 | landed   | 02 mins delay | 264d07ad9908789a13ff057082e60af80aa0d00d
 (3 rows)
 
 
@@ -134,7 +135,7 @@ and at blockchain table
  blockheight | blockepoch |                eventshash                | nonce  | previousblockhash |                blockhash
 -------------+------------+------------------------------------------+--------+-------------------+------------------------------------------
            0 |          0 | 0                                        |      0 | 0                 | genesis
-           1 | 1518508125 | 6cb23ec944b926f7b31d8cf786e898c216519c91 | 927131 | genesis           | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f
+           1 | 1518521155 | 8302b4a6357d0bb9b8fc32b5356ecc1c02868cff | 949579 | genesis           | 077eae18086555f69b9681dda55075d8cdd87ff4
 (2 rows)
 
 
@@ -148,11 +149,11 @@ DELETE 0
 UPDATE 0
  blockheight | eventepoch |         info1         |  info2   |     info3      |                eventhash
 -------------+------------+-----------------------+----------+----------------+------------------------------------------
-          -1 | 1518508125 | VY4321                | landed   |                | 9e835dc91c376ae1d97ae08913d6ead932668664
-           1 | 1518508125 | VY1234                | took off | 12 mins delay  | 2d8b9b759bf9b0dc6fb861ed68414945c8ce3908
-           1 | 1518508125 | VY1234                | landed   | 02 mins delay  | 2b34052e3531e7ea544adc8325e25697d660d2c2
-          -1 | 1518508125 | Product 8896513573165 | Expires  | 2018-09-23     | f135d4cd6f257e619d99ff67565436f2867b35e1
-          -1 | 1518508125 | Part 578285471821     | Produced | Factory DE2742 | 48a1fbf23a273fa679e870719a9ad8b5dee22b2c
+          -1 | 1518521155 | VY4321                | landed   |                | cb112adf2d9349d5fbb5658a6373753974a3340e
+           1 | 1518521155 | VY1234                | took off | 12 mins delay  | 5c2e37b8ec1843f059133b50e73e94321c372129
+           1 | 1518521155 | VY1234                | landed   | 02 mins delay  | 264d07ad9908789a13ff057082e60af80aa0d00d
+          -1 | 1518521155 | Product 8896513573165 | Expires  | 2018-09-23     | a98bd6a27302a0d7d1259c01456b174e2aac14ac
+          -1 | 1518521155 | Part 578285471821     | Produced | Factory DE2742 | 7dfdeca2cb7d0ee3c400bc6f18e7299049983f05
 (5 rows)
 
 
@@ -164,8 +165,8 @@ UPDATE 0
  blockheight | blockepoch |                eventshash                | nonce  |            previousblockhash             |                blockhash
 -------------+------------+------------------------------------------+--------+------------------------------------------+------------------------------------------
            0 |          0 | 0                                        |      0 | 0                                        | genesis
-           1 | 1518508125 | 6cb23ec944b926f7b31d8cf786e898c216519c91 | 927131 | genesis                                  | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f
-           2 | 1518508125 | 5f828c5b8fadba8d389e641e4c5726dcb00889d6 | 708621 | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f | 0ed1e25d6b1c77bf96656295304c4662be24d3b7
+           1 | 1518521155 | 8302b4a6357d0bb9b8fc32b5356ecc1c02868cff | 949579 | genesis                                  | 077eae18086555f69b9681dda55075d8cdd87ff4
+           2 | 1518521155 | fed7350b31121a591f95626bf6623837b37759d4 | 645081 | 077eae18086555f69b9681dda55075d8cdd87ff4 | 0c28549bf34e64eb278d3c893d8744490569a6b4
 (3 rows)
 
 
@@ -188,13 +189,13 @@ Now, force an update, and make validation fail
 ALTER TABLE
  blockheight | eventepoch | info1  | info2  |     info3     |                eventhash
 -------------+------------+--------+--------+---------------+------------------------------------------
-           1 | 1518508125 | VY1234 | landed | 02 mins delay | 2b34052e3531e7ea544adc8325e25697d660d2c2
+           1 | 1518521155 | VY1234 | landed | 02 mins delay | 264d07ad9908789a13ff057082e60af80aa0d00d
 (1 row)
 
 UPDATE 1
  blockheight | eventepoch | info1  | info2  |  info3  |                eventhash
 -------------+------------+--------+--------+---------+------------------------------------------
-           1 | 1518508125 | VY1234 | landed | on time | 2b34052e3531e7ea544adc8325e25697d660d2c2
+           1 | 1518521155 | VY1234 | landed | on time | 264d07ad9908789a13ff057082e60af80aa0d00d
 (1 row)
 
 psql:demo.sql:69: ERROR:  P0001: **** Event table has been altered!!!
@@ -213,20 +214,20 @@ UPDATE 1
 
  blockheight | eventepoch |         info1         |  info2   |     info3      |                eventhash
 -------------+------------+-----------------------+----------+----------------+------------------------------------------
-           1 | 1518508125 | VY1234                | took off | 12 mins delay  | 2d8b9b759bf9b0dc6fb861ed68414945c8ce3908
-           2 | 1518508125 | VY4321                | landed   |                | 9e835dc91c376ae1d97ae08913d6ead932668664
-           2 | 1518508125 | Product 8896513573165 | Expires  | 2018-09-23     | f135d4cd6f257e619d99ff67565436f2867b35e1
-           3 | 1518508125 | Part 578285471821     | Produced | Factory DE2742 | 48a1fbf23a273fa679e870719a9ad8b5dee22b2c
-           1 | 1518508125 | VY1234                | landed   | 02 mins delay  | 2b34052e3531e7ea544adc8325e25697d660d2c2
+           1 | 1518521155 | VY1234                | took off | 12 mins delay  | 5c2e37b8ec1843f059133b50e73e94321c372129
+           2 | 1518521155 | VY4321                | landed   |                | cb112adf2d9349d5fbb5658a6373753974a3340e
+           2 | 1518521155 | Product 8896513573165 | Expires  | 2018-09-23     | a98bd6a27302a0d7d1259c01456b174e2aac14ac
+           3 | 1518521155 | Part 578285471821     | Produced | Factory DE2742 | 7dfdeca2cb7d0ee3c400bc6f18e7299049983f05
+           1 | 1518521155 | VY1234                | landed   | 02 mins delay  | 264d07ad9908789a13ff057082e60af80aa0d00d
 (5 rows)
 
 
  blockheight | blockepoch |                eventshash                | nonce  |            previousblockhash             |                blockhash
 -------------+------------+------------------------------------------+--------+------------------------------------------+------------------------------------------
            0 |          0 | 0                                        |      0 | 0                                        | genesis
-           1 | 1518508125 | 6cb23ec944b926f7b31d8cf786e898c216519c91 | 927131 | genesis                                  | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f
-           2 | 1518508125 | 5f828c5b8fadba8d389e641e4c5726dcb00889d6 | 708621 | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f | 0ed1e25d6b1c77bf96656295304c4662be24d3b7
-           3 | 1518508125 | 29ad9df72baa094e483d2a1a9a3ccfba274d214c | 611296 | 0ed1e25d6b1c77bf96656295304c4662be24d3b7 | 0ef829bedc3b4232870bfe9c46db25933903f39e
+           1 | 1518521155 | 8302b4a6357d0bb9b8fc32b5356ecc1c02868cff | 949579 | genesis                                  | 077eae18086555f69b9681dda55075d8cdd87ff4
+           2 | 1518521155 | fed7350b31121a591f95626bf6623837b37759d4 | 645081 | 077eae18086555f69b9681dda55075d8cdd87ff4 | 0c28549bf34e64eb278d3c893d8744490569a6b4
+           3 | 1518521155 | 0f9dc5f5ac4772ac2366224c0688eab53665afde |  37430 | 0c28549bf34e64eb278d3c893d8744490569a6b4 | 0bae99c6229f55702d11e0dc47355ff66e2035ee
 (4 rows)
 
 
@@ -234,13 +235,13 @@ UPDATE 1
 ALTER TABLE
  blockheight | blockepoch |                eventshash                | nonce  |            previousblockhash             |                blockhash
 -------------+------------+------------------------------------------+--------+------------------------------------------+------------------------------------------
-           2 | 1518508125 | 5f828c5b8fadba8d389e641e4c5726dcb00889d6 | 708621 | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f | 0ed1e25d6b1c77bf96656295304c4662be24d3b7
+           2 | 1518521155 | fed7350b31121a591f95626bf6623837b37759d4 | 645081 | 077eae18086555f69b9681dda55075d8cdd87ff4 | 0c28549bf34e64eb278d3c893d8744490569a6b4
 (1 row)
 
 UPDATE 1
  blockheight | blockepoch |                eventshash                | nonce  |            previousblockhash             |                blockhash
 -------------+------------+------------------------------------------+--------+------------------------------------------+------------------------------------------
-           2 | 1111111111 | 5f828c5b8fadba8d389e641e4c5726dcb00889d6 | 708621 | 0eab2377e13d29e69e8c4412f78aaba623c0bd9f | 0ed1e25d6b1c77bf96656295304c4662be24d3b7
+           2 | 1111111111 | fed7350b31121a591f95626bf6623837b37759d4 | 645081 | 077eae18086555f69b9681dda55075d8cdd87ff4 | 0c28549bf34e64eb278d3c893d8744490569a6b4
 (1 row)
 
 psql:demo.sql:90: ERROR:  P0001: **** Blockchain table has been altered!!!
@@ -258,16 +259,27 @@ ALTER TABLE
 DROP SEQUENCE
 CREATE SEQUENCE
 INSERT 0 1
+ NowGeneratingBlock
+--------------------
+ t
+(1 row)
 
-INSERT 0 6
+
+INSERT 0 1
+ pg_sleep
+----------
+
+(1 row)
+
+INSERT 0 5
  blockheight | eventepoch |                           info1                           |                          info2                          |  info3  |                eventhash
 -------------+------------+-----------------------------------------------------------+---------------------------------------------------------+---------+------------------------------------------
-          -1 | 1518508125 | FROM GENESIS                                              | TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15   | 999 BTC | c46c08b6f423f35593ddf2ba97c10e625237499b
-          -1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | e610b5905b0ce861099d9fc0aa2be222551b40b1
-          -1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03 | 99 BTC  | 397835c2eaece6b52ba70d5afd8029da0ec94aea
-          -1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | 99 BTC  | e8a3d9e8af4472c2dec2084c5c00dae1c1943dce
-          -1 | 1518508125 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e | 9 BTC   | 19ab09deaafc72b79dd6999f96624dfd82a466b1
-          -1 | 1518508125 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson5 c40caa2ac5de6957097512e61bf0d590c3b7446d | 9 BTC   | ab39373683ccfdae1bd3d65703ce32158462bb1f
+          -1 | 1518521155 | FROM GENESIS                                              | TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15   | 999 BTC | 8301bb7d03be996de5de6c07401c363af89818dc
+          -1 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | 192bd3198baeea44089ed50fdf03487a7770f207
+          -1 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03 | 99 BTC  | dc69e0e16a4a8aeaa8909a3eed11b95df3666861
+          -1 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | 99 BTC  | 5f530b0a6570b876317b7c75f00f601e326eaaef
+          -1 | 1518521156 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e | 9 BTC   | c3285e70598fdfa54ca29166371fd46b16029b35
+          -1 | 1518521156 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson5 c40caa2ac5de6957097512e61bf0d590c3b7446d | 9 BTC   | e2496614f13a822556fa7b4f444ae562180d8a3b
 (6 rows)
 
  NowGeneratingBlock
@@ -290,28 +302,35 @@ INSERT 0 6
  t
 (1 row)
 
-psql:demo.sql:126: ERROR:  P0001: **** Blockchain table has been altered!!!
-CONTEXT:  PL/pgSQL function blockchaininpostgres.generateblock() line 23 at IF
-LOCATION:  exec_stmt_raise, pl_exec.c:3216
+ NowGeneratingBlock
+--------------------
+ t
+(1 row)
+
+ NowGeneratingBlock
+--------------------
+ t
+(1 row)
+
  blockheight | eventepoch |                           info1                           |                          info2                          |  info3  |                eventhash
 -------------+------------+-----------------------------------------------------------+---------------------------------------------------------+---------+------------------------------------------
-           1 | 1518508125 | FROM GENESIS                                              | TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15   | 999 BTC | c46c08b6f423f35593ddf2ba97c10e625237499b
-           1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | e610b5905b0ce861099d9fc0aa2be222551b40b1
-           2 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03 | 99 BTC  | 397835c2eaece6b52ba70d5afd8029da0ec94aea
-           2 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | 99 BTC  | e8a3d9e8af4472c2dec2084c5c00dae1c1943dce
-           3 | 1518508125 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e | 9 BTC   | 19ab09deaafc72b79dd6999f96624dfd82a466b1
-           3 | 1518508125 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson5 c40caa2ac5de6957097512e61bf0d590c3b7446d | 9 BTC   | ab39373683ccfdae1bd3d65703ce32158462bb1f
+           1 | 1518521155 | FROM GENESIS                                              | TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15   | 999 BTC | 8301bb7d03be996de5de6c07401c363af89818dc
+           1 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | 192bd3198baeea44089ed50fdf03487a7770f207
+           2 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03 | 99 BTC  | dc69e0e16a4a8aeaa8909a3eed11b95df3666861
+           2 | 1518521156 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | 99 BTC  | 5f530b0a6570b876317b7c75f00f601e326eaaef
+           3 | 1518521156 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e | 9 BTC   | c3285e70598fdfa54ca29166371fd46b16029b35
+           3 | 1518521156 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson5 c40caa2ac5de6957097512e61bf0d590c3b7446d | 9 BTC   | e2496614f13a822556fa7b4f444ae562180d8a3b
 (6 rows)
 
 
  blockheight | blockepoch |                eventshash                | nonce  |            previousblockhash             |                blockhash
 -------------+------------+------------------------------------------+--------+------------------------------------------+------------------------------------------
            0 |          0 | 0                                        |      0 | 0                                        | genesis
-           1 | 1518508125 | 081b070a137f8e8f66c08117a478f3815522020e | 491481 | genesis                                  | 0dd4c4e253e97dfcabad7c1302cf73f9a9fc0f38
-           2 | 1518508125 | 9f3261c52ad2a0cd9539a6c5662e9c72716cc18d | 975633 | 0dd4c4e253e97dfcabad7c1302cf73f9a9fc0f38 | 0333336b6704e5284c317b430d3174756207c3ce
-           3 | 1518508125 | ddbb3ac18c8b5cda7b5994f7ac3e72cda6a31be8 | 202485 | 0333336b6704e5284c317b430d3174756207c3ce | 06ea73cad402f3c42fd97fb16b921d78f2e229c9
-           4 | 1518508125 | 9142739bc1b7310adb657aa2c53e9973f8753151 | 207390 | 06ea73cad402f3c42fd97fb16b921d78f2e229c9 | 0becc3ddab119f56452db3fe6ad63b896dc2f7c0
-(5 rows)
+           1 | 1518521156 | ac3f84eb830bf4006ecd263e21395cf1a8960596 | 760753 | genesis                                  | 0106129ac4680d724b37f803d6a81ecadbd0f559
+           2 | 1518521156 | 34b1ab4ccb6c570c6fe484431bee3b85c440b6ba | 735718 | 0106129ac4680d724b37f803d6a81ecadbd0f559 | 03c954f4b2bf83ba753223c268b4aca637bdcd71
+           3 | 1518521156 | 456082acfaca77c95bbfa0698ca556cd5c63437d | 231024 | 03c954f4b2bf83ba753223c268b4aca637bdcd71 | 096709b19a1f3248acb3b02e624aeb338414692d
+(4 rows)
+
 
 =#
 ```
