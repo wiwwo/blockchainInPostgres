@@ -105,13 +105,15 @@ drop sequence if exists blockchainInPostgres.blockHeightSeq;
 create sequence blockchainInPostgres.blockHeightSeq start 1;
 insert into blockchainInPostgres.blockChain (blockHeight, blockEpoch, eventsHash, nonce, previousBlockHash, blockHash)
 values (0, 0, 0, 0, 0, 'genesis');
-
+select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 
 
 \echo
 insert into blockchainInPostgres.events (info1, info2, info3)
-values ('FROM GENESIS','TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15', '999 BTC')
-     , ('FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29','TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15', '99 BTC')
+values ('FROM GENESIS','TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15', '999 BTC');
+select pg_sleep(0.3);
+insert into blockchainInPostgres.events (info1, info2, info3)
+values ('FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29','TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15', '99 BTC')
      , ('FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29','TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03', '99 BTC')
      , ('FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29','TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb', '99 BTC')
      , ('FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb','TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e', '9 BTC')
@@ -119,6 +121,7 @@ values ('FROM GENESIS','TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15', 
 ;
 
 select * from blockchainInPostgres.events order by eventEpoch;
+select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";
 select blockchainInPostgres.generateBlock() as "NowGeneratingBlock";

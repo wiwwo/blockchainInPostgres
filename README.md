@@ -295,8 +295,8 @@ CONTEXT:  PL/pgSQL function blockchaininpostgres.generateblock() line 23 at IF
 LOCATION:  exec_stmt_raise, pl_exec.c:3216
  blockheight | eventepoch |                           info1                           |                          info2                          |  info3  |                eventhash
 -------------+------------+-----------------------------------------------------------+---------------------------------------------------------+---------+------------------------------------------
-           1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | e610b5905b0ce861099d9fc0aa2be222551b40b1
            1 | 1518508125 | FROM GENESIS                                              | TO RobinHood y8c0bbd7ecc77a0924dadce65a09b2ead146ad15   | 999 BTC | c46c08b6f423f35593ddf2ba97c10e625237499b
+           1 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson1 y8c0bbd7ecc77a0924dadce65a09b2ead146ad15 | 99 BTC  | e610b5905b0ce861099d9fc0aa2be222551b40b1
            2 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson2 efb71bb90b344a3495adf3457a8705c178beeb03 | 99 BTC  | 397835c2eaece6b52ba70d5afd8029da0ec94aea
            2 | 1518508125 | FROM RobinHood xb7a04e27dcbcfe0cedf06faa4f36c084d4a1a29   | TO PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | 99 BTC  | e8a3d9e8af4472c2dec2084c5c00dae1c1943dce
            3 | 1518508125 | FROM PoorPerson3 161897cffdbd367faedc1484f705788001acdbbb | TO PoorPerson4 27142e2859f95012f45951e47621bfd6153af46e | 9 BTC   | 19ab09deaafc72b79dd6999f96624dfd82a466b1
