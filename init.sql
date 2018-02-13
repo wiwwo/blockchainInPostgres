@@ -196,6 +196,7 @@ language plpgsql as
 $$
 declare
     blockSize           integer = 2;
+    pendingTransNum     integer;
     hashCursor          cursor for
                           select eventHash from blockchainInPostgres.events where blockHeight=-1 order by eventepoch limit blockSize;
     thisHash            varchar(50) = ' ';
@@ -214,6 +215,17 @@ declare
     prevBlockHash     varchar(50);
 
 begin
+
+  select 1
+    into pendingTransNum
+    from blockchainInPostgres.events
+   where blockHeight = -1
+   limit 1
+  ;
+
+  if pendingTransNum is null then
+    return 1;
+  end if;
 
   if not blockchainInPostgres.validateBlock()
   then
