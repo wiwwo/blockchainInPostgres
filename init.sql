@@ -1,6 +1,6 @@
 -- install package postgresql-contrib-{pg_version}
 
-create extension pgcrypto;
+create extension if not exists pgcrypto;
 
 
 drop schema if exists blockchainInPostgres cascade;
